@@ -27,6 +27,7 @@
  * @link     http://api.summon.serialssolutions.com/help/api/ API Documentation
  */
 require_once dirname(__FILE__) . '/Exception.php';
+require_once dirname(__FILE__) . '/Query.php';
 
 /**
  * Summon REST API Interface (abstract base class)
@@ -84,6 +85,13 @@ abstract class SerialsSolutions_Summon_Base
     protected $authedUser = false;
 
     /**
+     * Acceptable response type from Summon
+     * Currently summon supports json and xml
+     * @var string
+     */
+    protected $responseType = "json";
+    
+    /**
      * Constructor
      *
      * Sets up the Summon API Client
@@ -97,6 +105,7 @@ abstract class SerialsSolutions_Summon_Base
      *      <li>host - base URL of Summon API</li>
      *      <li>sessionId - Summon session ID to apply</li>
      *      <li>version - API version to use</li>
+     *      <li>responseType - Acceptable response (json or xml)</li>
      *    </ul>
      */
     public function __construct($apiId, $apiKey, $options = array())
@@ -104,7 +113,7 @@ abstract class SerialsSolutions_Summon_Base
         // Process incoming parameters:
         $this->apiId = $apiId;
         $this->apiKey = $apiKey;
-        $legalOptions = array('authedUser', 'debug', 'host', 'sessionId', 'version');
+        $legalOptions = array('authedUser', 'debug', 'host', 'sessionId', 'version', 'responseType');
         foreach ($legalOptions as $option) {
             if (isset($options[$option])) {
                 $this->$option = $options[$option];
@@ -152,7 +161,7 @@ abstract class SerialsSolutions_Summon_Base
      *
      * @return array             An array of query results
      */
-    public function query($query, $returnErr = false)
+    public function query($query , $service = 'search', $method = 'GET', $raw = false, $returnErr = false)
     {
         // Query String Parameters
         $options = $query->getOptionsArray();
@@ -173,7 +182,7 @@ abstract class SerialsSolutions_Summon_Base
         $this->debugPrint('Query: ' . print_r($options, true));
 
         try {
-            $result = $this->call($options);
+            $result = $this->call($options, $service, $method, $raw);
         } catch (SerialsSolutions_Summon_Exception $e) {
             if ($returnErr) {
                 return array(
@@ -195,7 +204,7 @@ abstract class SerialsSolutions_Summon_Base
      * @param array  $params  An array of parameters for the request
      * @param string $service The API Service to call
      * @param string $method  The HTTP Method to use
-     * @param bool   $raw     Whether to return raw XML or processed
+     * @param bool   $raw     Whether to return raw JSON or processed
      *
      * @throws SerialsSolutions_Summon_Exception
      * @return object         The Summon API response (or a PEAR_Error object).
@@ -223,7 +232,7 @@ abstract class SerialsSolutions_Summon_Base
 
         // Build Authorization Headers
         $headers = array(
-            'Accept' => 'application/json',
+            'Accept' => 'application/'.$this->responseType,
             'x-summon-date' => date('D, d M Y H:i:s T'),
             'Host' => 'api.summon.serialssolutions.com'
         );
@@ -235,10 +244,13 @@ abstract class SerialsSolutions_Summon_Base
             $headers['x-summon-session-id'] = $this->sessionId;
         }
 
-        // Send and process request
-        return $this->process(
-            $this->httpRequest($baseUrl, $method, $queryString, $headers)
-        );
+        // Send request
+        $result = $this->httpRequest($baseUrl, $method, $queryString, $headers);
+        if (! $raw) {
+        	// Process response
+        	$result = $this->process($result); 
+        }
+        return $result;
     }
 
     /**
@@ -251,6 +263,9 @@ abstract class SerialsSolutions_Summon_Base
      */
     protected function process($input)
     {
+    	if ($this->responseType !== "json")
+    		return $input;
+    	
         // Unpack JSON Data
         $result = json_decode($input, true);
 

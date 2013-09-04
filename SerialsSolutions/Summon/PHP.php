@@ -1,6 +1,6 @@
 <?php
 /**
- * Summon Search API Interface (PEAR implementation)
+ * Summon Search API Interface (Simple PHP implementation)
  *
  * PHP version 5
  *
@@ -21,32 +21,23 @@
  *
  * @category SerialsSolutions
  * @package  Summon
- * @author   Andrew Nagy <andrew.nagy@serialssolutions.com>
- * @author   Demian Katz <demian.katz@villanova.edu>
+ * @author   Rushabh Pasad <developer@rushabhpasad.in>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     http://api.summon.serialssolutions.com/help/api/ API Documentation
  */
-require_once 'PEAR.php';
-require_once 'HTTP/Request.php';
 require_once dirname(__FILE__) . '/Base.php';
 
 /**
- * Summon Search API Interface (PEAR implementation)
+ * Summon Search API Interface (PHP implementation)
  *
  * @category SerialsSolutions
  * @package  Summon
- * @author   Andrew Nagy <andrew.nagy@serialssolutions.com>
- * @author   Demian Katz <demian.katz@villanova.edu>
+ * @author   Rushabh Pasad <developer@rushabhpasad.in>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     http://api.summon.serialssolutions.com/help/api/ API Documentation
  */
-class SerialsSolutions_Summon_PEAR extends SerialsSolutions_Summon_Base
+class SerialsSolutions_Summon_PHP extends SerialsSolutions_Summon_Base
 {
-    /**
-     * The HTTP_Request object used for API transactions
-     * @var object HTTP_Request
-     */
-    protected $client;
 
     /**
      * Constructor
@@ -68,7 +59,6 @@ class SerialsSolutions_Summon_PEAR extends SerialsSolutions_Summon_Base
     public function __construct($apiId, $apiKey, $options = array())
     {
         parent::__construct($apiId, $apiKey, $options);
-        $this->client = new HTTP_Request(null, array('useBrackets' => false));
     }
 
     /**
@@ -78,13 +68,13 @@ class SerialsSolutions_Summon_PEAR extends SerialsSolutions_Summon_Base
      *
      * @return void
      */
-    public function handleFatalError($e)
+    public function handleFatalError($e) 
     {
-        PEAR::raiseError(new PEAR_Error($e->getMessage()));
+        throw $e;
     }
 
     /**
-     * Perform an HTTP request.
+     * Perform a GET HTTP request.
      *
      * @param string $baseUrl     Base URL for request
      * @param string $method      HTTP method for request
@@ -94,25 +84,30 @@ class SerialsSolutions_Summon_PEAR extends SerialsSolutions_Summon_Base
      * @throws SerialsSolutions_Summon_Exception
      * @return string             HTTP response body
      */
-    protected function httpRequest($baseUrl, $method, $queryString, $headers)
+    protected function httpRequest($baseUrl, $method, $queryString,$headers) 
     {
         $this->debugPrint(
             "{$method}: {$baseUrl}?{$queryString}"
         );
-
-        // Set up request
-        $this->client->setURL($baseUrl);
-        $this->client->setMethod($method);
-        $this->client->addRawQueryString($queryString);
-        foreach ($headers as $key => $value) {
-            $this->client->addHeader($key, $value);
+        
+        // Modify headers as summon needs it in "key: value" format
+        $modified_headers = array();
+        foreach ($headers as $key=>$value) {
+        	$modified_headers[] = $key.": ".$value;
         }
+		
+        $curl = curl_init();
+		curl_setopt_array($curl, array(
+			CURLOPT_RETURNTRANSFER => 1,
+			CURLOPT_URL => "{$baseUrl}?{$queryString}",
+			CURLOPT_HTTPHEADER => $modified_headers
+		));
+		$result = curl_exec($curl);
+		if ($result === FALSE) {
+			throw new SerialsSolutions_Summon_Exception("Error in HTTP Request.");
+		}
+		curl_close($curl);
 
-        // Send Request
-        $result = $this->client->sendRequest();
-        if (PEAR::isError($result)) {
-            throw new SerialsSolutions_Summon_Exception($result->getMessage());
-        }
-        return $this->client->getResponseBody();
-    }
+		return $result;
+	}
 }

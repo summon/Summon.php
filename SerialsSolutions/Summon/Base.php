@@ -59,7 +59,7 @@ abstract class SerialsSolutions_Summon_Base
      * @var string
      */
     protected $version = '2.0.0';
-    
+
     /**
      * The secret Key used for authentication
      * @var string
@@ -85,6 +85,13 @@ abstract class SerialsSolutions_Summon_Base
     protected $authedUser = false;
 
     /**
+     * Acceptable response type from Summon
+     * Currently summon supports json and xml
+     * @var string
+     */
+    protected $responseType = "json";
+
+    /**
      * Constructor
      *
      * Sets up the Summon API Client
@@ -98,6 +105,7 @@ abstract class SerialsSolutions_Summon_Base
      *      <li>host - base URL of Summon API</li>
      *      <li>sessionId - Summon session ID to apply</li>
      *      <li>version - API version to use</li>
+     *      <li>responseType - Acceptable response (json or xml)</li>
      *    </ul>
      */
     public function __construct($apiId, $apiKey, $options = array())
@@ -105,7 +113,9 @@ abstract class SerialsSolutions_Summon_Base
         // Process incoming parameters:
         $this->apiId = $apiId;
         $this->apiKey = $apiKey;
-        $legalOptions = array('authedUser', 'debug', 'host', 'sessionId', 'version');
+        $legalOptions = array(
+            'authedUser', 'debug', 'host', 'sessionId', 'version', 'responseType'
+        );
         foreach ($legalOptions as $option) {
             if (isset($options[$option])) {
                 $this->$option = $options[$option];
@@ -224,7 +234,7 @@ abstract class SerialsSolutions_Summon_Base
 
         // Build Authorization Headers
         $headers = array(
-            'Accept' => 'application/json',
+            'Accept' => 'application/'.$this->responseType,
             'x-summon-date' => date('D, d M Y H:i:s T'),
             'Host' => 'api.summon.serialssolutions.com'
         );
@@ -252,6 +262,10 @@ abstract class SerialsSolutions_Summon_Base
      */
     protected function process($input)
     {
+        if ($this->responseType !== "json") {
+            return $input;
+        }
+
         // Unpack JSON Data
         $result = json_decode($input, true);
 

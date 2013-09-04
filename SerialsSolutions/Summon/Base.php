@@ -161,7 +161,7 @@ abstract class SerialsSolutions_Summon_Base
      *
      * @return array             An array of query results
      */
-    public function query($query, $returnErr = false)
+    public function query($query , $service = 'search', $method = 'GET', $raw = false, $returnErr = false)
     {
         // Query String Parameters
         $options = $query->getOptionsArray();
@@ -182,7 +182,7 @@ abstract class SerialsSolutions_Summon_Base
         $this->debugPrint('Query: ' . print_r($options, true));
 
         try {
-            $result = $this->call($options);
+            $result = $this->call($options, $service, $method, $raw);
         } catch (SerialsSolutions_Summon_Exception $e) {
             if ($returnErr) {
                 return array(
@@ -204,7 +204,7 @@ abstract class SerialsSolutions_Summon_Base
      * @param array  $params  An array of parameters for the request
      * @param string $service The API Service to call
      * @param string $method  The HTTP Method to use
-     * @param bool   $raw     Whether to return raw XML or processed
+     * @param bool   $raw     Whether to return raw JSON or processed
      *
      * @throws SerialsSolutions_Summon_Exception
      * @return object         The Summon API response (or a PEAR_Error object).
@@ -244,10 +244,13 @@ abstract class SerialsSolutions_Summon_Base
             $headers['x-summon-session-id'] = $this->sessionId;
         }
 
-        // Send and process request
-        return $this->process(
-            $this->httpRequest($baseUrl, $method, $queryString, $headers)
-        );
+        // Send request
+        $result = $this->httpRequest($baseUrl, $method, $queryString, $headers);
+        if (! $raw) {
+        	// Process response
+        	$result = $this->process($result); 
+        }
+        return $result;
     }
 
     /**

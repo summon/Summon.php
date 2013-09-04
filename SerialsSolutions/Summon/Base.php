@@ -27,6 +27,7 @@
  * @link     http://api.summon.serialssolutions.com/help/api/ API Documentation
  */
 require_once dirname(__FILE__) . '/Exception.php';
+require_once dirname(__FILE__) . '/Query.php';
 
 /**
  * Summon REST API Interface (abstract base class)

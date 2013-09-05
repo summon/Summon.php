@@ -140,17 +140,18 @@ abstract class SerialsSolutions_Summon_Base
     /**
      * Retrieves a document specified by the ID.
      *
-     * @param string $id The document to retrieve from the Summon API
+     * @param string $id  The document to retrieve from the Summon API
+     * @param bool   $raw Return raw (true) or processed (false) response?
      *
      * @return string    The requested resource
      */
-    public function getRecord($id)
+    public function getRecord($id, $raw = false)
     {
         $this->debugPrint("Get Record: $id");
 
         // Query String Parameters
         $options = array('s.q' => sprintf('ID:"%s"', $id));
-        return $this->call($options);
+        return $this->call($options, 'search', 'GET', $raw);
     }
 
     /**

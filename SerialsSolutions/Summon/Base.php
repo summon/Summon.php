@@ -331,6 +331,15 @@ abstract class SerialsSolutions_Summon_Base
     }
 
     /**
+     * Handle a fatal error.
+     *
+     * @param SerialsSolutions_Summon_Exception $e Exception to process.
+     *
+     * @return void
+     */
+    abstract public function handleFatalError($e);
+
+    /**
      * Perform an HTTP request.
      *
      * @param string $baseUrl     Base URL for request

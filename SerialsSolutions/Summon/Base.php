@@ -206,7 +206,7 @@ abstract class SerialsSolutions_Summon_Base
      * @param array  $params  An array of parameters for the request
      * @param string $service The API Service to call
      * @param string $method  The HTTP Method to use
-     * @param bool   $raw     Whether to return raw XML or processed
+     * @param bool   $raw     Return raw (true) or processed (false) response?
      *
      * @throws SerialsSolutions_Summon_Exception
      * @return object         The Summon API response (or a PEAR_Error object).
@@ -246,10 +246,13 @@ abstract class SerialsSolutions_Summon_Base
             $headers['x-summon-session-id'] = $this->sessionId;
         }
 
-        // Send and process request
-        return $this->process(
-            $this->httpRequest($baseUrl, $method, $queryString, $headers)
-        );
+        // Send request
+        $result = $this->httpRequest($baseUrl, $method, $queryString, $headers);
+        if (!$raw) {
+            // Process response
+            $result = $this->process($result); 
+        }
+        return $result;
     }
 
     /**

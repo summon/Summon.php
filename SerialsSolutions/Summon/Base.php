@@ -160,10 +160,12 @@ abstract class SerialsSolutions_Summon_Base
      * @param bool                          $returnErr On fatal error, should we fail
      * outright (false) or treat it as an empty result set with an error key set
      * (true)?
+     * @param bool                          $raw       Return raw (true) or processed
+     * (false) response?
      *
      * @return array             An array of query results
      */
-    public function query($query, $returnErr = false)
+    public function query($query, $returnErr = false, $raw = false)
     {
         // Query String Parameters
         $options = $query->getOptionsArray();
@@ -184,7 +186,7 @@ abstract class SerialsSolutions_Summon_Base
         $this->debugPrint('Query: ' . print_r($options, true));
 
         try {
-            $result = $this->call($options);
+            $result = $this->call($options, 'search', 'GET', $raw);
         } catch (SerialsSolutions_Summon_Exception $e) {
             if ($returnErr) {
                 return array(

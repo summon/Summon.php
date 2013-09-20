@@ -64,6 +64,12 @@ class SerialsSolutions_Summon_Query
     protected $filters = array();
 
     /**
+     * An array of group filters to be applied
+     * @var array
+     */
+    protected $groupFilters = array();
+
+    /**
      * An array of range filters to be applied
      * @var array
      */
@@ -161,6 +167,9 @@ class SerialsSolutions_Summon_Query
         if (!empty($this->filters)) {
             $options['s.fvf'] = $this->filters;
         }
+        if (!empty($this->groupFilters)) {
+            $options['s.fvgf'] = $this->groupFilters;
+        }
         if (!empty($this->rangeFilters)) {
             $options['s.rf'] = $this->rangeFilters;
         }
@@ -188,6 +197,18 @@ class SerialsSolutions_Summon_Query
     public function addFilter($f)
     {
         $this->filters[] = $f;
+    }
+
+    /**
+     * Add a group filter
+     *
+     * @param string $f Filter to apply
+     *
+     * @return void
+     */
+    public function addGroupFilter($f)
+    {
+        $this->groupFilters[] = $f;
     }
 
     /**

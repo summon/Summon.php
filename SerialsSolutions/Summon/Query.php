@@ -118,6 +118,12 @@ class SerialsSolutions_Summon_Query
     protected $highlightEnd = '';
 
     /**
+     * Preferred search language (affects relevancy ranking)
+     * @var string
+     */
+    protected $language = 'en';
+
+    /**
      * Constructor
      *
      * Sets up the Summon API Client
@@ -159,7 +165,8 @@ class SerialsSolutions_Summon_Query
             's.ps' => $this->pageSize,
             's.pn' => $this->pageNumber,
             's.ho' => $this->holdings ? 'true' : 'false',
-            's.dym' => $this->didYouMean ? 'true' : 'false'
+            's.dym' => $this->didYouMean ? 'true' : 'false',
+            's.l' => $this->language,
         );
         if (!empty($this->facets)) {
             $options['s.ff'] = $this->facets;

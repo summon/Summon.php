@@ -130,6 +130,12 @@ class SerialsSolutions_Summon_Query
     protected $expand = false;
 
     /**
+     * Open access filter setting
+     * @var bool
+     */
+    protected $openAccessFilter = false;
+
+    /**
      * IDs to fetch in place of a regular query
      * @var array
      */
@@ -209,6 +215,9 @@ class SerialsSolutions_Summon_Query
         }
         if ($this->expand) {
             $options['s.exp'] = 'true';
+        }
+        if ($this->openAccessFilter) {
+            $options['s.oaf'] = 'true';
         }
         if ($this->highlight) {
             $options['s.hl'] = 'true';

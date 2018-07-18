@@ -9,6 +9,9 @@ Framework 2.x.
 
 Changelog
 ---------
+** v1.2.0 **
+* Added optional $idType parameter to getRecord to support s.bookMark record retrieval.
+
 ** v1.1.0 **
 * Added openAccessFilter option to support s.oaf parameter.
 

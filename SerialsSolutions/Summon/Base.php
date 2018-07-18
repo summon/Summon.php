@@ -41,6 +41,9 @@ require_once dirname(__FILE__) . '/Query.php';
  */
 abstract class SerialsSolutions_Summon_Base
 {
+    const IDENTIFIER_ID = 1;
+    const IDENTIFIER_BOOKMARK = 2;
+
     /**
      * A boolean value determining whether to print debug information
      * @var bool
@@ -138,19 +141,23 @@ abstract class SerialsSolutions_Summon_Base
     }
 
     /**
-     * Retrieves a document specified by the ID.
+     * Retrieves a document specified by the ID or bookmark.
      *
-     * @param string $id  The document to retrieve from the Summon API
-     * @param bool   $raw Return raw (true) or processed (false) response?
+     * @param string $id     The document to retrieve from the Summon API
+     * @param bool   $raw    Return raw (true) or processed (false) response?
+     * @param int     idType Constant representing type of $id (either standard
+     * identifier -- IDENTIFIER_ID -- or bookmark -- IDENTIFIER_BOOKMARK).
      *
      * @return string    The requested resource
      */
-    public function getRecord($id, $raw = false)
+    public function getRecord($id, $raw = false, $idType = self::IDENTIFIER_ID)
     {
         $this->debugPrint("Get Record: $id");
 
         // Query String Parameters
-        $options = array('s.q' => sprintf('ID:"%s"', $id));
+        $options = $idType === self::IDENTIFIER_BOOKMARK
+            ? array('s.bookMark' => $id)
+            : array('s.q' => sprintf('ID:"%s"', $id));
         $options['s.role'] = $this->authedUser ? 'authenticated' : 'none';
         return $this->call($options, 'search', 'GET', $raw);
     }

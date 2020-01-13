@@ -4,11 +4,14 @@ Serials Solutions Summon Library
 Introduction
 ------------
 This is a generic library for interacting with Serials Solutions' Summon.
-Implementations are provided for PEAR, Zend Framework 1.x and Zend
+Implementations are provided for Laminas, PEAR, Zend Framework 1.x and Zend
 Framework 2.x.
 
 Changelog
 ---------
+** v1.3.0 **
+* Added Laminas integration.
+
 ** v1.2.0 **
 * Added optional $idType parameter to getRecord to support s.bookMark record retrieval.
 

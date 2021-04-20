@@ -9,6 +9,9 @@ Framework 2.x.
 
 Changelog
 ---------
+** v1.3.1 **
+* Bug fixes (including improved PHP 8 compatibility).
+
 ** v1.3.0 **
 * Added Laminas integration.
 

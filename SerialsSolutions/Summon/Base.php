@@ -246,7 +246,7 @@ abstract class SerialsSolutions_Summon_Base
         // Build Authorization Headers
         $headers = array(
             'Accept' => 'application/'.$this->responseType,
-            'x-summon-date' => date('D, d M Y H:i:s T'),
+            'x-summon-date' => gmdate('D, d M Y H:i:s T'),
             'Host' => 'api.summon.serialssolutions.com'
         );
         $data = implode("\n", $headers) . "\n/$this->version/$service\n" .

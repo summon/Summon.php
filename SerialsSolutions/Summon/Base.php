@@ -249,7 +249,7 @@ abstract class SerialsSolutions_Summon_Base
             'x-summon-date' => date('D, d M Y H:i:s T'),
             'Host' => 'api.summon.serialssolutions.com'
         );
-        $data = implode($headers, "\n") . "\n/$this->version/$service\n" .
+        $data = implode("\n", $headers) . "\n/$this->version/$service\n" .
             urldecode($queryString) . "\n";
         $hmacHash = $this->hmacsha1($this->apiKey, $data);
         $headers['Authorization'] = "Summon $this->apiId;$hmacHash";

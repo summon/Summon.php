@@ -235,7 +235,7 @@ abstract class SerialsSolutions_Summon_Base
                     $additional = urlencode($additional);
                     $query[] = "$function=$additional";
                 }
-            } else {
+            } elseif (!is_null($value)) {
                 $value = urlencode($value);
                 $query[] = "$function=$value";
             }
